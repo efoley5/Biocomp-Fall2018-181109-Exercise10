@@ -1,7 +1,51 @@
-data=read.csv("data1.csv", stringsAsFactors = F)
+data=read.csv("data1.csv", stringsAsFactors = F, header= TRUE)
 head(data)
 library(deSolve)
 library(ggplot2)
+
+### Problem 1 
+
+#create likelihood function 
+linear<- function(p,x,y){
+  BO=p[1]
+  B1=p[2]
+  sigma=exp(p[3])
+  
+  pred=BO+B1*x #equation for a linear model 
+  nll=-sum(dnorm(x=y, mean=pred, sd=sigma, log=TRUE))
+  
+  return(nll)
+}
+
+quad<- function(p,x,y){
+  BO=p[1]
+  B1=p[2]
+  B2=p[3]
+  sigma=exp(p[4])
+  
+  pred=BO+(B1*x)+(B2*(x^2)) #equation for quadratic model 
+  nll=-sum(dnorm(x=y, mean=pred, sd=sigma, log=TRUE))
+  
+  return(nll)
+}
+
+#estimate parameters 
+linearGuess=c(1,1,1)
+quadGuess=c(1,1,1,1)
+
+fitlinear=optim(par=linearGuess,fn=linear,x=data$x,y=data$y)
+fitquad=optim(par=quadGuess,fn=linear,x=data$x,y=data$y)
+
+print(fitlinear)
+print(fitquad)
+
+# run likelihood ratio test
+teststat=2*(fitlinear$value-fitquad$value)
+
+df=length(fitquad$par)-length(fitlinear$par)
+
+1-pchisq(teststat,df)
+
 
 ###Problem 2 
 ddSim<- function(t,y,p){
