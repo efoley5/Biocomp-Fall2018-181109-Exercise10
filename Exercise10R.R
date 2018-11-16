@@ -47,8 +47,10 @@ df=length(fitquad$par)-length(fitlinear$par)
 1-pchisq(teststat,df)
 
 
+
 ###Problem 2 
-ddSim<- function(t,y,p){
+
+ddSim<- function(t,y,p){ #create custom function 
   N1=y[1]
   N2=y[2]
   
@@ -59,37 +61,40 @@ ddSim<- function(t,y,p){
   a21=p[5]
   a22=p[6]
   
-  dN1dt=r1*(1-(N1*a11)-(N2*a12))*N1
-  dN2dt=r2*(1-(N2*a22)-(N1*a21))*N2
+  dN1dt=r1*(1-(N1*a11)-(N2*a12))*N1 #need 2 equations because there is 2
+  dN2dt=r2*(1-(N2*a22)-(N1*a21))*N2 #state variables 
   return(list(c(dN1dt,dN2dt)))
 }
 
-#Case 1 
-params=c(0.5,0.5,0.5,0.1,0.5,0.1)
+#Case 1- coexist 
+params1=c(0.4,0.4,0.05,0.01,0.02,0.05)
 NO=c(1,1)
 times= 1:100
 
-modelSim=ode(y=NO,times=times,func=ddSim,parms=params)
-modelOutput=data.frame(time=modelSim[,1],N=modelSim[,2])
-ggplot(modelOutput,aes(x=time,y=N))+geom_line()+theme_classic() 
+modelSim1=ode(y=NO,times=times,func=ddSim,parms=params1)
+modelOutput1=data.frame(time=modelSim1[,1],N1=modelSim1[,2],N2=modelSim1[,3])
+ggplot(modelOutput1,aes(x=time,y=N1))+geom_line()+geom_line(data=modelOutput1, mapping=aes(x=time,y=N2),col='red')+theme_classic() 
 
 
-#Case 2 
-params=c(1,1,0.1,0.5,0.4,0.4,0.1)
+#Case 2- coexist 
+params2=c(0.5,0.5,0.1,0.02,0.05,0.1)
 NO=c(1,1)
 times= 1:100
 
-modelSim=ode(y=NO,times=times,func=ddSim,parms=params)
-modelOutput=data.frame(time=modelSim[,1],N=modelSim[,2])
-ggplot(modelOutput,aes(x=time,y=N))+geom_line()+theme_classic() 
+modelSim2=ode(y=NO,times=times,func=ddSim,parms=params2)
+modelOutput2=data.frame(time=modelSim2[,1],N1=modelSim2[,2],N2=modelSim2[,3])
+ggplot(modelOutput2,aes(x=time,y=N1))+geom_line()+geom_line(data=modelOutput2, mapping=aes(x=time,y=N2),col='red')+theme_classic() 
 
 
+#Case 3- does not coexist 
+params3=c(0.3,0.3,0.1,0.1,0.5,0.1)
+NO=c(1,1)
+times= 1:100
 
+modelSim3=ode(y=NO,times=times,func=ddSim,parms=params3)
+modelOutput3=data.frame(time=modelSim3[,1],N1=modelSim3[,2],N2=modelSim3[,3])
+ggplot(modelOutput3,aes(x=time,y=N1))+geom_line()+geom_line(data=modelOutput3, mapping=aes(x=time,y=N2),col='red')+theme_classic() 
 
-
-
-out2=data.frame(time=sim2[,1],normal=sim2[,2],tumor=sim2[,3])
-ggplot(out2,aes(x=time,y=normal))+geom_line()+geom_line(data=out2,mapping=aes(x=time,y=tumor),col='red')+theme_classic()
 
 
 
